@@ -18,6 +18,7 @@ def format(from_file_name, to_file_name):
         for i in range(len(lines)):
             # remove white space to one
             curr_line += ' '.join(lines[i].split())
+            curr_line += " "
             if i+1 >= len(lines) or len(lines[i+1]) <= 1:
                 new_lines.append(curr_line)
                 curr_line = ""
@@ -37,10 +38,16 @@ def concat_audio_files(folder_path, output_file):
 
     files = sorted(files, key=lambda x: int(x.split('_')[-1].split('.')[0]))
 
-    print(f"files: {files}")
+    # print(f"files: {files}")
+
+    paragraph_pause = AudioSegment.silent(duration=1000) # 1s pause between paragraphs
 
     audio = AudioSegment.empty()
     for f in files:
         audio += AudioSegment.from_file(f"{folder_path}/{f}")
+        audio += paragraph_pause
+
 
     audio.export(output_file, format="mp3")
+
+# format("eng_fic/adv_of_sherlock/raw_chaps/1", "eng_fic/adv_of_sherlock/new_test/1")
