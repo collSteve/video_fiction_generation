@@ -1,0 +1,9 @@
+{
+    "channel_models": [
+        { 
+            "name": "puzzle video", 
+            "ai_srcipt_prompt": "",
+            "frame_dissection_prompt": ""
+        }
+    ]
+}
