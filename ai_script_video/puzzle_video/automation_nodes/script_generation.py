@@ -1,0 +1,27 @@
+from ai_script_video.puzzle_video.puzzle_script_generation import generate_script
+from automation.automation_node import AutomationNode, TaskStatus, TaskVariable
+
+
+class ScriptGenerationTask(AutomationNode):
+
+    def __init__(self):
+        super().__init__()
+
+        # add inputs
+        self.inputs["puzzle_item"] = TaskVariable(type="PuzzleDBItem", value=None, name="puzzle_item", link=None)
+        self.inputs["script_system_prompt_path"] = TaskVariable(type="str", value=None, name="script_system_prompt_path", link=None)
+
+        # add outputs
+        self.outputs["generated_script"] = TaskVariable(type="PuzzleScriptObj", value=None, name="generated_script", link=None)
+    
+    def run(self):
+        super().run()
+
+        generated_script = generate_script(self.inputs["puzzle_item"], system_prompt_path=self.inputs["script_system_prompt_path"])
+
+
+        if generated_script is None:
+            raise Exception("Generated script is None (probably gpt error)")
+        
+        self.outputs["generated_script"] = generated_script
+        self.status = TaskStatus.Completed
