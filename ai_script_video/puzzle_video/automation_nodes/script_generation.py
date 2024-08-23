@@ -1,5 +1,5 @@
 from ai_script_video.puzzle_video.puzzle_script_generation import generate_script
-from automation.automation_node import AutomationNode, TaskStatus, TaskVariable
+from automation.automation_node import AutomationNode, TaskStatus, TaskInput
 
 
 class ScriptGenerationTask(AutomationNode):
@@ -8,11 +8,11 @@ class ScriptGenerationTask(AutomationNode):
         super().__init__()
 
         # add inputs
-        self._inputs["puzzle_item"] = TaskVariable(type="PuzzleDBItem", value=None, name="puzzle_item", link=None)
-        self._inputs["script_system_prompt_path"] = TaskVariable(type="str", value=None, name="script_system_prompt_path", link=None)
+        self._inputs["puzzle_item"] = TaskInput(type="PuzzleDBItem", value=None, name="puzzle_item", link=None)
+        self._inputs["script_system_prompt_path"] = TaskInput(type="str", value=None, name="script_system_prompt_path", link=None)
 
         # add outputs
-        self._outputs["generated_script"] = TaskVariable(type="PuzzleScriptObj", value=None, name="generated_script", link=None)
+        self._outputs["generated_script"] = TaskInput(type="PuzzleScriptObj", value=None, name="generated_script", link=None)
     
     def _run(self):
         super()._run()

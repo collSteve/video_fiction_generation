@@ -1,5 +1,5 @@
 import json
-from automation.automation_node import AutomationNode, TaskStatus, TaskVariable
+from automation.automation_node import AutomationNode, TaskStatus, TaskInput
 
 
 class SaveJsonDBTask(AutomationNode):
@@ -7,11 +7,11 @@ class SaveJsonDBTask(AutomationNode):
         super().__init__(global_graph, id)
 
         # add inputs
-        self._inputs["json_obj_list"] = TaskVariable(type="json_list", value=None, name="json_obj_list", link=None)
-        self._inputs["db_path"] = TaskVariable(type="path", value=None, name="db_path", link=None)
+        self._inputs["json_obj_list"] = TaskInput(type="json_list", value=None, name="json_obj_list", link=None)
+        self._inputs["db_path"] = TaskInput(type="path", value=None, name="db_path", link=None)
 
         # add outputs
-        self._outputs["directing"] = TaskVariable(type="router", value=None, name="directing", link=None)
+        self._outputs["directing"] = TaskInput(type="router", value=None, name="directing", link=None)
 
     def validate_inputs(self):
         return super().validate_inputs() and isinstance(self._inputs["json_obj_list"].value, list)

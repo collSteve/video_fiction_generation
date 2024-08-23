@@ -6,7 +6,7 @@ from ai_script_video.puzzle_video.automation_nodes.script_generation import Scri
 from ai_script_video.puzzle_video.puzzle_generation import generate_puzzles
 from ai_script_video.puzzle_video.puzzle_persistence import ProcessStatus, QueryObj, get_puzzle, query_puzzle_item, ScriptGenerationStatus, save_puzzles
 from ai_script_video.puzzle_video.puzzle_script_generation import generate_script
-from automation.automation_node import AutomationNode, TaskStatus, TaskVariable
+from automation.automation_node import AutomationNode, TaskStatus, TaskInput
 
 
 puzzle_db_path = "puzzle.db.json"

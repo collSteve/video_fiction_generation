@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 from enum import Enum
-from typing import Any, Callable, List, Self
+from typing import Any, Callable, List, Self, overload
 from pydantic import BaseModel
 
 import warnings
 import copy
 
-from automation.automation_graph import AutomationGraph
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from automation.automation_graph import AutomationGraph
 
 
 class TaskStatus(str, Enum):
@@ -13,19 +17,20 @@ class TaskStatus(str, Enum):
     In_Progress = "In Progress"
     Completed = "Completed"
     Failed = "Failed"
+    Scheduled = "Scheduled"
 
 class VariableStatus(str, Enum):
     Not_Set = "Not Set"
     Set = "Set"
 
 class TaskLink(BaseModel):
-    origin_task_id: str
-    target_task_id: str
-    origin_node_output_name: str
+    source_node_id: str
+    target_node_id: str
+    source_node_output_name: str
     target_node_input_name: str
     variable_type: str
 
-class TaskVariable(BaseModel):
+class TaskInput(BaseModel):
     type: str
     value: Any = None
     name: str
@@ -43,20 +48,16 @@ class TaskOutput(BaseModel):
 
 # items in road map
 class AutomationNode():
-    # next_tasks: List[Self] = []
-    # previous_tasks: List[Self] = []
-    _status: TaskStatus
-
-    _inputs: dict[str, TaskVariable] = []
-    _outputs: dict[str, TaskOutput] = []
-
-    _global_graph: AutomationGraph
 
     def __init__(self, global_graph, id):
-        self._status = TaskStatus.Not_Started
-        self._global_graph = global_graph
-
+        self._status: TaskStatus = TaskStatus.Not_Started
         self._id = id
+
+        self._inputs: dict[str, TaskInput] = {}
+        self._outputs: dict[str, TaskOutput] = {}
+
+        self._global_graph: AutomationGraph = global_graph
+
 
     def can_start(self):
         if len(self.previous_nodes) == 0:
@@ -93,13 +94,13 @@ class AutomationNode():
         if input_name in self._inputs:
             raise ValueError(f"Input {input_name} already exists")
         
-        self._inputs[input_name] = TaskVariable(name=input_name, value=None, type=input_type, validator=validator)
+        self._inputs[input_name] = TaskInput(name=input_name, value=None, type=input_type, validator=validator)
 
     def add_output(self, output_name:str, output_type:str, validator:Callable[[Any],bool]=None):
         if output_name in self._outputs:
             raise ValueError(f"Output {output_name} already exists")
         
-        self._outputs[output_name] = TaskVariable(name=output_name, value=None, type=output_type, validator=validator)
+        self._outputs[output_name] = TaskOutput(name=output_name, value=None, type=output_type, validator=validator)
     
     def remove_input(self, input_name:str):
         if input_name not in self._inputs:
@@ -135,9 +136,74 @@ class AutomationNode():
             self._run()
         except Exception as e:
             self._status = TaskStatus.Failed
+
+        # run succeded
+        # mark all outputs as set
+        for output_item in self._outputs.values():
+            output_item.status = VariableStatus.Set
         
         self._status = TaskStatus.Completed
 
+    def schedule(self):   
+        self._status = TaskStatus.Scheduled
+
+    @overload
+    def link_input(self, input_name:str, source_node_id:str, source_node_output_name:str, variable_type:str):
+        if input_name not in self._inputs:
+            raise ValueError(f"Input {input_name} does not exist")
+        
+        if self._inputs[input_name].link is not None:
+            raise ValueError(f"Input {input_name} already linked")
+        
+        if self._inputs[input_name].type != variable_type:
+            raise ValueError(f"Input {input_name} type mismatch")
+        
+        link =  TaskLink(source_node_id=source_node_id, 
+                         target_node_id=self._id, 
+                         source_node_output_name=source_node_output_name, 
+                         target_node_input_name=input_name, 
+                         variable_type=variable_type)
+  
+        self.link_input(link)
+
+
+    def link_input(self, link: TaskLink):
+        if link.target_node_id != self._id:
+            raise ValueError(f"Link target node id {link.target_node_id} does not match node id {self._id}")
+        
+        if link.target_node_input_name not in self._inputs:
+            raise ValueError(f"Input {link.target_node_input_name} does not exist")
+        
+        if self._inputs[link.target_node_input_name].link is not None:
+            raise ValueError(f"Input {link.target_node_input_name} already linked")
+        
+        if self._inputs[link.target_node_input_name].type != link.variable_type:
+            raise ValueError(f"Input {link.target_node_input_name} type mismatch")
+        
+        self._inputs[link.target_node_input_name].link = link
+
+    @overload
+    def link_output(self, output_name:str, target_node_id:str, target_node_input_name:str, variable_type:str):
+        link = TaskLink(source_node_id=self._id, 
+                        target_node_id=target_node_id, 
+                        source_node_output_name=output_name, 
+                        target_node_input_name=target_node_input_name, 
+                        variable_type=variable_type)
+        
+        self.link_output(link)
+        
+    
+    def link_output(self, link: TaskLink):
+        if link.source_node_id != self._id:
+            raise ValueError(f"Link source node id {link.source_node_id} does not match node id {self._id}")
+        
+        if link.source_node_output_name not in self._outputs:
+            raise ValueError(f"Output {link.source_node_output_name} does not exist")
+        
+        if self._outputs[link.source_node_output_name].type != link.variable_type:
+            raise ValueError(f"Output {link.source_node_output_name} type mismatch")
+        
+        self._outputs[link.source_node_output_name].links.append(link)
 
     @property
     def previous_nodes(self)->List[Self]:
@@ -146,7 +212,8 @@ class AutomationNode():
         
         nodes = []
         for input_item in self._inputs.values():
-            nodes.append(self._global_graph.get_node_by_id(input_item.link.origin_task_id))
+            if input_item.link is not None:
+                nodes.append(self._global_graph.get_node_by_id(input_item.link.source_node_id))
         
         return nodes
     
@@ -158,7 +225,7 @@ class AutomationNode():
         nodes = []
         for output_item in self._outputs.values():
             for link in output_item.links:
-                nodes.append(self._global_graph.get_node_by_id(link.target_task_id))
+                nodes.append(self._global_graph.get_node_by_id(link.target_node_id))
         
         return nodes
     
@@ -177,3 +244,4 @@ class AutomationNode():
     @property
     def outputs(self):
         return copy.deepcopy(self._outputs)
+    

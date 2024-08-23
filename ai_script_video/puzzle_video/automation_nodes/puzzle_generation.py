@@ -1,6 +1,6 @@
 from ai_script_video.puzzle_video.puzzle_generation import generate_puzzles
 from ai_script_video.puzzle_video.puzzle_persistence import QueryObj, query_puzzle_item
-from automation.automation_node import AutomationNode, TaskStatus, TaskVariable
+from automation.automation_node import AutomationNode, TaskStatus, TaskInput
 
 
 class PuzzleGenerationTask(AutomationNode):
@@ -8,11 +8,11 @@ class PuzzleGenerationTask(AutomationNode):
         super().__init__(global_graph, id)
 
         # add inputs
-        self._inputs["puzzle_db_path"] = TaskVariable(type="str", value=None, name="puzzle_db_path", link=None)
-        self._inputs["puzzle_creation_system_prompt_path"] = TaskVariable(type="str", value=None, name="puzzle_creation_system_prompt_path", link=None)
+        self._inputs["puzzle_db_path"] = TaskInput(type="str", value=None, name="puzzle_db_path", link=None)
+        self._inputs["puzzle_creation_system_prompt_path"] = TaskInput(type="str", value=None, name="puzzle_creation_system_prompt_path", link=None)
 
         # add outputs
-        self._outputs["generated_puzzles"] = TaskVariable(type="List[RawPuzzle]", value=None, name="generated_puzzles", link=None)
+        self._outputs["generated_puzzles"] = TaskInput(type="List[RawPuzzle]", value=None, name="generated_puzzles", link=None)
     
     def _run(self):
         super()._run()

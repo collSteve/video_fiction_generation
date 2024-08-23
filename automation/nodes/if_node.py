@@ -1,22 +1,23 @@
 from typing import Any, Callable
 from pydantic import BaseModel
 
-from automation.automation_node import AutomationNode, TaskVariable
+from automation.automation_node import AutomationNode, TaskInput, TaskOutput
 
 
 class AutomationIFNode(AutomationNode):
-    _logic_return: bool | None = None
-
-    _yes_output: TaskVariable | None = None
-    _no_output: TaskVariable | None = None
-
-    _output_name: str
+    
 
     def __init__(self, global_graph, id, execute_logic: Callable[[Any],bool], output_name: str):
         super().__init__(global_graph, id)
 
+        self._yes_output: TaskOutput | None = None
+        self._no_output: TaskOutput | None = None
+
         self._execute_logic = execute_logic
         self._output_name = output_name
+
+        self._logic_return: bool | None = None
+
     
     def add_input(self, input_name: str, input_type: str, validator: Callable[[Any], bool] = None):
         if len(self._inputs) > 0:
@@ -27,10 +28,10 @@ class AutomationIFNode(AutomationNode):
         raise ValueError("You should not use add_oupout on an IF node. Use set_yes_output and set_no_output instead")
     
     def set_yes_output(self, output_name: str, output_type: str, validator: Callable[[Any], bool] = None):
-        self._yes_output = TaskVariable(name=output_name, value=None, type=output_type, validator=validator)
+        self._yes_output = TaskOutput(name=output_name, value=None, type=output_type, validator=validator)
 
     def set_no_output(self, output_name: str, output_type: str, validator: Callable[[Any], bool] = None):
-        self._no_output = TaskVariable(name=output_name, value=None, type=output_type, validator=validator)
+        self._no_output = TaskOutput(name=output_name, value=None, type=output_type, validator=validator)
 
     def _run(self):
         super()._run()
