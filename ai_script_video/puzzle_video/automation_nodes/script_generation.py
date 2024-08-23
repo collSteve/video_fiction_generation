@@ -8,20 +8,20 @@ class ScriptGenerationTask(AutomationNode):
         super().__init__()
 
         # add inputs
-        self.inputs["puzzle_item"] = TaskVariable(type="PuzzleDBItem", value=None, name="puzzle_item", link=None)
-        self.inputs["script_system_prompt_path"] = TaskVariable(type="str", value=None, name="script_system_prompt_path", link=None)
+        self._inputs["puzzle_item"] = TaskVariable(type="PuzzleDBItem", value=None, name="puzzle_item", link=None)
+        self._inputs["script_system_prompt_path"] = TaskVariable(type="str", value=None, name="script_system_prompt_path", link=None)
 
         # add outputs
-        self.outputs["generated_script"] = TaskVariable(type="PuzzleScriptObj", value=None, name="generated_script", link=None)
+        self._outputs["generated_script"] = TaskVariable(type="PuzzleScriptObj", value=None, name="generated_script", link=None)
     
-    def run(self):
-        super().run()
+    def _run(self):
+        super()._run()
 
-        generated_script = generate_script(self.inputs["puzzle_item"], system_prompt_path=self.inputs["script_system_prompt_path"])
+        generated_script = generate_script(self._inputs["puzzle_item"], system_prompt_path=self._inputs["script_system_prompt_path"])
 
 
         if generated_script is None:
             raise Exception("Generated script is None (probably gpt error)")
         
-        self.outputs["generated_script"] = generated_script
-        self.status = TaskStatus.Completed
+        self._outputs["generated_script"] = generated_script
+        self._status = TaskStatus.Completed

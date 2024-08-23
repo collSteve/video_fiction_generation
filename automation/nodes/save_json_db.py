@@ -7,19 +7,19 @@ class SaveJsonDBTask(AutomationNode):
         super().__init__(global_graph, id)
 
         # add inputs
-        self.inputs["json_obj_list"] = TaskVariable(type="json_list", value=None, name="json_obj_list", link=None)
-        self.inputs["db_path"] = TaskVariable(type="path", value=None, name="db_path", link=None)
+        self._inputs["json_obj_list"] = TaskVariable(type="json_list", value=None, name="json_obj_list", link=None)
+        self._inputs["db_path"] = TaskVariable(type="path", value=None, name="db_path", link=None)
 
         # add outputs
-        self.outputs["directing"] = TaskVariable(type="router", value=None, name="directing", link=None)
+        self._outputs["directing"] = TaskVariable(type="router", value=None, name="directing", link=None)
 
     def validate_inputs(self):
-        return super().validate_inputs() and isinstance(self.inputs["json_obj_list"].value, list)
+        return super().validate_inputs() and isinstance(self._inputs["json_obj_list"].value, list)
     
-    def run(self):
-        super().run()
+    def _run(self):
+        super()._run()
 
-        with open(self.inputs["db_path"].value, "w+") as f:
+        with open(self._inputs["db_path"].value, "w+") as f:
             # add to json obj stored in file
             f.seek(0)
 
@@ -27,13 +27,13 @@ class SaveJsonDBTask(AutomationNode):
 
             # validate data is List
             if not isinstance(data, list):
-                self.status = TaskStatus.Failed
+                self._status = TaskStatus.Failed
                 return
 
-            for json_obj in self.inputs["json_obj_list"].value:
+            for json_obj in self._inputs["json_obj_list"].value:
                 data.append(json_obj)
             
             f.seek(0)
             json.dump(data, f, indent=4)
         
-        self.status = TaskStatus.Completed
+        self._status = TaskStatus.Completed

@@ -1,0 +1,56 @@
+{
+    "nodes": [
+        {
+            "name": "task 1",
+            "node_class": "Task",
+            "inputs": [
+                {
+                    "name": "input 1",
+                    "type": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output 1",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "task 2",
+            "node_class": "Task",
+            "inputs": [
+                {
+                    "name": "input 1",
+                    "type": "string"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "output 1",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "name": "input 1",
+            "type": "string"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "output 1",
+            "type": "string"
+        }
+    ],
+    "links": [
+        {
+            "source_node": "task 1",
+            "source_output": "output 1",
+            "target_node": "task 2",
+            "target_input": "input 1"
+        }
+    ]
+}

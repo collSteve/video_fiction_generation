@@ -88,7 +88,7 @@ class AutomationJob(BaseModel):
     def next_task(self):
         if self.current_task is None:
             raise Exception("No task started")
-        if self.current_task.status == TaskStatus.Completed:
+        if self.current_task._status == TaskStatus.Completed:
             if self.tasks.index(self.current_task) + 1 < len(self.tasks):
                 self.current_task = self.tasks[self.tasks.index(self.current_task) + 1]
             else:
@@ -106,7 +106,7 @@ class AutomationJob(BaseModel):
         self.status = status
 
     def set_current_task_status(self, status: TaskStatus):
-        self.current_task.status = status
+        self.current_task._status = status
 
     def get_all_tasks(self):
         return self.tasks

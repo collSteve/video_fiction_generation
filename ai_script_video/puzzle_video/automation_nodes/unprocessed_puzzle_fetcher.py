@@ -7,16 +7,16 @@ class UnprocessedPuzzleFetcher(AutomationNode):
         super().__init__(global_graph, id)
 
         # add inputs
-        self.inputs["puzzle_db_path"] = TaskVariable(type="str", value=None, name="puzzle_db_path", link=None)
+        self._inputs["puzzle_db_path"] = TaskVariable(type="str", value=None, name="puzzle_db_path", link=None)
 
         # add outputs
-        self.outputs["unprocessed_puzzles"] = TaskVariable(type="List[RawPuzzle]", value=None, name="unprocessed_puzzles", link=None)
+        self._outputs["unprocessed_puzzles"] = TaskVariable(type="List[RawPuzzle]", value=None, name="unprocessed_puzzles", link=None)
     
-    def run(self):
-        super().run()
+    def _run(self):
+        super()._run()
 
         queryObj = QueryObj(attribute="process_status", is_valid=lambda x: x is ProcessStatus.Not_Started)
-        puzzle_items = query_puzzle_item(self.inputs["puzzle_db_path"], [queryObj])
+        puzzle_items = query_puzzle_item(self._inputs["puzzle_db_path"], [queryObj])
 
-        self.outputs["unprocessed_puzzles"] = puzzle_items
-        self.status = TaskStatus.Completed
+        self._outputs["unprocessed_puzzles"] = puzzle_items
+        self._status = TaskStatus.Completed

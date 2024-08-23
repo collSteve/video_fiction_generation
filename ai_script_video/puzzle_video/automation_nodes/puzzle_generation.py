@@ -8,27 +8,27 @@ class PuzzleGenerationTask(AutomationNode):
         super().__init__(global_graph, id)
 
         # add inputs
-        self.inputs["puzzle_db_path"] = TaskVariable(type="str", value=None, name="puzzle_db_path", link=None)
-        self.inputs["puzzle_creation_system_prompt_path"] = TaskVariable(type="str", value=None, name="puzzle_creation_system_prompt_path", link=None)
+        self._inputs["puzzle_db_path"] = TaskVariable(type="str", value=None, name="puzzle_db_path", link=None)
+        self._inputs["puzzle_creation_system_prompt_path"] = TaskVariable(type="str", value=None, name="puzzle_creation_system_prompt_path", link=None)
 
         # add outputs
-        self.outputs["generated_puzzles"] = TaskVariable(type="List[RawPuzzle]", value=None, name="generated_puzzles", link=None)
+        self._outputs["generated_puzzles"] = TaskVariable(type="List[RawPuzzle]", value=None, name="generated_puzzles", link=None)
     
-    def run(self):
-        super().run()
+    def _run(self):
+        super()._run()
 
         past_puzzle_questions = self.get_past_puzzle_questions()
 
-        generated_puzzles = generate_puzzles(past_puzzle_questions, system_prompt_path=self.inputs["puzzle_creation_system_prompt_path"])
+        generated_puzzles = generate_puzzles(past_puzzle_questions, system_prompt_path=self._inputs["puzzle_creation_system_prompt_path"])
 
         if generated_puzzles is None:
             raise Exception("Generated puzzles are None (probably gpt error)")
         
-        self.outputs["generated_puzzles"] = generated_puzzles
-        self.status = TaskStatus.Completed
+        self._outputs["generated_puzzles"] = generated_puzzles
+        self._status = TaskStatus.Completed
 
     def get_past_puzzle_questions(self):
         queryObj = QueryObj(attribute="puzzle_question", is_valid=lambda x: x is not None)
-        puzzle_items = query_puzzle_item(self.inputs["puzzle_db_path"], [queryObj])
+        puzzle_items = query_puzzle_item(self._inputs["puzzle_db_path"], [queryObj])
 
         return [item.puzzle_question for item in puzzle_items]
