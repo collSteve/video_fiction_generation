@@ -1,9 +1,8 @@
-from __future__ import annotations
-
 from copy import deepcopy
 from enum import Enum
 from typing import Any, List, Self, Set
 
+from automation.nodes.if_node import AutomationIFNode
 from utils.queue import Queue
 import warnings
 
@@ -48,7 +47,13 @@ class AutomationGraph:
                 warnings.warn(f"[weird behaviour]: Node {current_node.id} is not scheduled with status {current_node.status}")
 
             if not current_node.can_start():
-                node_queue.put(current_node)
+                warnings.warn(f"Node: {current_node.id} cannot start")
+                
+                if any([x.status == TaskStatus.Failed for x in current_node.previous_nodes]):
+                    warnings.warn(f"Node: {current_node.id} cannot start because of failed previous nodes")
+                else:
+                    # put node back in queue
+                    node_queue.put(current_node)
                 continue
 
             current_node.execute()
@@ -59,10 +64,15 @@ class AutomationGraph:
                         target_node = self.get_node_by_id(link.target_node_id)
                         target_node.set_input_value(link.target_node_input_name, output_item.value)
 
+                        print(f"Setting input {link.target_node_input_name} of node {target_node.id} with value {output_item.value}")
+
+
                         # if target node is not in queue, add it and schedule it
                         if all([x.id != target_node.id for x in node_queue.skim_content]):
                             node_queue.put(target_node)
                             target_node.schedule()
+
+                            print(f"Node {target_node.id} scheduled")
 
     def execute(self):
         if not self.is_valid():
@@ -148,10 +158,40 @@ class AutomationGraph:
         source_node.link_output(link)
         target_node.link_input(link)
         
-        # source_node.outputs[source_node_output_name].links.append(link)
-        # target_node.inputs[target_node_input_name].link = link
 
         self.links.append(link)
+
+    def add_link_from_if_node(self, if_node_id:str, if_node_output_name:str, target_node_id:str, target_node_input_name:str, is_yes:bool):
+        if_node = self.get_node_by_id(if_node_id)
+        target_node = self.get_node_by_id(target_node_id) # make sure target node is in graph\
+
+        if not isinstance(if_node, AutomationIFNode):
+            raise ValueError(f"Node with id {if_node_id} is not an IF Node")
+
+        if_node_output = if_node.outputs[if_node_output_name]
+        target_input = target_node.inputs[target_node_input_name]
+
+        if if_node_output is None:
+            raise ValueError(f"Output {if_node_output} not found in node {if_node_id}")
+
+        if target_input is None:
+            raise ValueError(f"Input {target_node_input_name} not found in node {target_node_id}")
+
+        # make sure variable have the same type
+        if if_node_output.type != target_input.type:
+            raise ValueError(f"Output type {if_node_output.type} does not match input type {target_input.type}")
+
+
+        if is_yes:
+            if_node.set_yes_link(target_node_id, target_node_input_name, if_node_output.type)
+            link = if_node.yes_link
+        else:
+            if_node.set_no_link(target_node_id, target_node_input_name, if_node_output.type)
+            link = if_node.no_link
+        
+        target_node.link_input(link)
+        self.links.append(link)
+
 
     @property
     def inputs(self)->dict[str, TaskInput]:

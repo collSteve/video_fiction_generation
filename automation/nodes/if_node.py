@@ -1,53 +1,93 @@
 from typing import Any, Callable
 from pydantic import BaseModel
 
-from automation.automation_node import AutomationNode, TaskInput, TaskOutput
+from automation.automation_node import AutomationNode, TaskInput, TaskLink, TaskOutput
 
 
 class AutomationIFNode(AutomationNode):
     
 
-    def __init__(self, global_graph, id, execute_logic: Callable[[Any],bool], output_name: str):
+    def __init__(self, global_graph, id, execute_logic: Callable[[Any],bool]):
         super().__init__(global_graph, id)
 
-        self._yes_output: TaskOutput | None = None
-        self._no_output: TaskOutput | None = None
+        self._yes_link: TaskLink | None = None
+        self._no_link: TaskLink | None = None
 
         self._execute_logic = execute_logic
-        self._output_name = output_name
 
         self._logic_return: bool | None = None
 
-    
+
+    def configure_input_output(self, input_name: str, output_name: str, variable_type: str, validator: Callable[[Any], bool] = None):
+        if len(self._inputs) > 0 or len(self._outputs) > 0:
+            raise ValueError("IF Node can only have one input and one output")
+        super().add_input(input_name, variable_type, validator)
+        super().add_output(output_name, variable_type, validator) # if_node will output same value as input
+
+
     def add_input(self, input_name: str, input_type: str, validator: Callable[[Any], bool] = None):
-        if len(self._inputs) > 0:
-            raise ValueError("IF Node can only have one input")
-        super().add_input(input_name, input_type, validator)
+        raise ValueError("Not allowed to add input to IF Node, use configure_input_output instead")
+
 
     def add_output(self, output_name: str, output_type: str, validator: Callable[[Any], bool] = None):
-        raise ValueError("You should not use add_oupout on an IF node. Use set_yes_output and set_no_output instead")
-    
-    def set_yes_output(self, output_name: str, output_type: str, validator: Callable[[Any], bool] = None):
-        self._yes_output = TaskOutput(name=output_name, value=None, type=output_type, validator=validator)
+        raise ValueError("Not allowed to add input to IF Node, use configure_input_output instead")
 
-    def set_no_output(self, output_name: str, output_type: str, validator: Callable[[Any], bool] = None):
-        self._no_output = TaskOutput(name=output_name, value=None, type=output_type, validator=validator)
+
+    def set_yes_link(self, target_node_id: str, target_node_input_name: str, variable_type: str):
+        assert len(self._outputs) == 1, f"IF Node can only have one output, but found {len(self._outputs)}"
+        
+        self._yes_link = TaskLink(source_node_id=self.id, 
+                                  source_node_output_name=self.output_name, 
+                                  target_node_id=target_node_id, 
+                                  target_node_input_name=target_node_input_name,
+                                  variable_type=variable_type)
+
+    def set_no_link(self, target_node_id: str, target_node_input_name: str, variable_type: str):
+        assert len(self._outputs) == 1, f"IF Node can only have one output, but found {len(self._outputs)}"
+
+        self._no_link = TaskLink(source_node_id=self.id, 
+                                  source_node_output_name=self.output_name, 
+                                  target_node_id=target_node_id, 
+                                  target_node_input_name=target_node_input_name,
+                                  variable_type=variable_type)
 
     def _run(self):
-        super()._run()
 
-        assert len(self._inputs) == 1, "IF Node can only have one input"
+        assert len(self._inputs) == 1, f"IF Node can only have one input, but found {len(self._inputs)}"
+        assert len(self._outputs) == 1, f"IF Node can only have one output, but found {len(self._outputs)}"
 
-        self.outputs = {}
 
-        self._logic_return = self._execute_logic(self._inputs[self._input_info.variable_name].value)
+        self._outputs[self.output_name].value = self._inputs[self.input_name].value
+
+        self._logic_return = self._execute_logic(self._inputs[self.input_name].value)
         if self._logic_return:
-            self.outputs[self._output_name] = self._yes_output
+            print(f"run yes branch, input value: {self._inputs[self.input_name].value}") 
+            self._outputs[self.output_name].links = [self._yes_link]
         else:
-            self.outputs[self._output_name] = self._no_output
-
-        self.outputs[self._output_name].value = self._inputs.values()[0].value
+            print(f"run no branch, input value: {self._inputs[self.input_name].value}")
+            self._outputs[self.output_name].links = [self._no_link]
 
     @property
     def logic_return(self):
         return self._logic_return
+    
+    @property
+    def yes_link(self):
+        return self._yes_link
+    
+    @property
+    def no_link(self):
+        return self._no_link
+    
+    @property
+    def output_name(self):
+        assert len(self._outputs) == 1, f"IF Node can only have one output, but found {len(self._outputs)}"
+        
+        return list(self._outputs.keys())[0]
+    
+    @property
+    def input_name(self):
+        assert len(self._inputs) == 1, f"IF Node can only have one input, but found {len(self._inputs)}"
+        
+        return list(self._inputs.keys())[0]
+    

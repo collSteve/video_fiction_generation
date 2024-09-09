@@ -1,0 +1,182 @@
+[
+    {
+        "id": "1",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Mysterious Traveler",
+        "puzzle_question": "I travel around the world but never leave my corner. What am I?",
+        "puzzle_answer": "A stamp.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "2",
+        "puzzle_type": "Logic Riddle",
+        "puzzle_title": "The Paradox of Choice",
+        "puzzle_question": "I am not alive, but I can grow. I don\u2019t have lungs, but I need air. What am I?",
+        "puzzle_answer": "Fire.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "3",
+        "puzzle_type": "Brain Teaser",
+        "puzzle_title": "The Endless Echo",
+        "puzzle_question": "What can speak without a mouth and hear without ears?",
+        "puzzle_answer": "An echo.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "4",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Curious Container",
+        "puzzle_question": "What gets wetter as it dries?",
+        "puzzle_answer": "A towel.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "5",
+        "puzzle_type": "Logic Riddle",
+        "puzzle_title": "The Family Conundrum",
+        "puzzle_question": "I have many keys but open no locks. I have space but no room. What am I?",
+        "puzzle_answer": "A keyboard.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "6",
+        "puzzle_type": "Brain Teaser",
+        "puzzle_title": "The Sound of Silence",
+        "puzzle_question": "What begins with T, ends with T, and has T in it?",
+        "puzzle_answer": "A teapot.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "7",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Invisible Touch",
+        "puzzle_question": "What can you catch but not throw?",
+        "puzzle_answer": "A cold.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "8",
+        "puzzle_type": "Logic Riddle",
+        "puzzle_title": "The Frost-bitten Riddle",
+        "puzzle_question": "What has roots that nobody sees, is taller than trees, up, up it goes, and yet never grows?",
+        "puzzle_answer": "A mountain.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "9",
+        "puzzle_type": "Brain Teaser",
+        "puzzle_title": "The Eternal Cycle",
+        "puzzle_question": "What runs around the yard without moving?",
+        "puzzle_answer": "A fence.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "10",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Light-Fingered Thief",
+        "puzzle_question": "What can fill a room but takes up no space?",
+        "puzzle_answer": "Light.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "11",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Enigmatic Shadow",
+        "puzzle_question": "I am always with you, but you can never touch me. I can change shape but remain the same. What am I?",
+        "puzzle_answer": "Your shadow.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "12",
+        "puzzle_type": "Logic Riddle",
+        "puzzle_title": "The Curious Time Traveler",
+        "puzzle_question": "I can be broken but never held. I can be shared but never seen. What am I?",
+        "puzzle_answer": "A promise.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "13",
+        "puzzle_type": "Brain Teaser",
+        "puzzle_title": "The Whispering Winds",
+        "puzzle_question": "I can be loud or silent, I can have many sounds, but I am not an instrument. What am I?",
+        "puzzle_answer": "The wind.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "14",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Celestial Keeper",
+        "puzzle_question": "I have a bed but never sleep. I have a mouth and a fork but never eat. What am I?",
+        "puzzle_answer": "A river.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "15",
+        "puzzle_type": "Logic Riddle",
+        "puzzle_title": "The Ever-Changing Escape",
+        "puzzle_question": "I can be cracked, made, told, and played. What am I?",
+        "puzzle_answer": "A joke.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "16",
+        "puzzle_type": "Brain Teaser",
+        "puzzle_title": "The Timeless Traveler",
+        "puzzle_question": "Always in front of you but never seen, it\u2019s coming but it won\u2019t arrive. What is it?",
+        "puzzle_answer": "Tomorrow.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "17",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Mysterious Container",
+        "puzzle_question": "I\u2019m full of holes but can still hold water. What am I?",
+        "puzzle_answer": "A sponge.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "18",
+        "puzzle_type": "Logic Riddle",
+        "puzzle_title": "The Stolen Treasure",
+        "puzzle_question": "What has a heart that doesn\u2019t beat?",
+        "puzzle_answer": "An artichoke.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "19",
+        "puzzle_type": "Brain Teaser",
+        "puzzle_title": "The Timeless Enigma",
+        "puzzle_question": "You can see me in water, but I never get wet. What am I?",
+        "puzzle_answer": "A reflection.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    },
+    {
+        "id": "20",
+        "puzzle_type": "Word Riddle",
+        "puzzle_title": "The Curious Kind",
+        "puzzle_question": "I\u2019m taken from a mine and shut up in a wooden case, from which I\u2019m never released. What am I?",
+        "puzzle_answer": "Pencil lead.",
+        "status": "Unused",
+        "process_status": "Not Started"
+    }
+]

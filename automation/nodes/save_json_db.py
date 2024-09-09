@@ -1,4 +1,5 @@
 import json
+import os.path
 from automation.automation_node import AutomationNode, TaskStatus, TaskInput
 
 
@@ -7,33 +8,43 @@ class SaveJsonDBTask(AutomationNode):
         super().__init__(global_graph, id)
 
         # add inputs
-        self._inputs["json_obj_list"] = TaskInput(type="json_list", value=None, name="json_obj_list", link=None)
-        self._inputs["db_path"] = TaskInput(type="path", value=None, name="db_path", link=None)
+        self.add_input("json_obj_list", "json_list")
+        self.add_input("db_path", "path")
 
         # add outputs
-        self._outputs["directing"] = TaskInput(type="router", value=None, name="directing", link=None)
+        self.add_output("directing", "router")
 
     def validate_inputs(self):
         return super().validate_inputs() and isinstance(self._inputs["json_obj_list"].value, list)
     
     def _run(self):
-        super()._run()
+        # check if file exists
+        if not os.path.isfile(self._inputs["db_path"].value):
+            json.dump([], open(self._inputs["db_path"].value, "w+"))
 
+        # read data from file
+        with open(self._inputs["db_path"].value, "r+") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                raise Exception("Error when loading json file")
+        
         with open(self._inputs["db_path"].value, "w+") as f:
-            # add to json obj stored in file
-            f.seek(0)
-
-            data = json.load(f)
-
             # validate data is List
             if not isinstance(data, list):
                 self._status = TaskStatus.Failed
                 return
 
             for json_obj in self._inputs["json_obj_list"].value:
+                if not isinstance(json_obj, dict):
+                    try:
+                        json_obj = json_obj.dict()
+                    except:
+                        self._status = TaskStatus.Failed
+                        return
                 data.append(json_obj)
             
-            f.seek(0)
             json.dump(data, f, indent=4)
-        
-        self._status = TaskStatus.Completed
+
+    def specify_input_list_type(self, variable_type:str):
+        self._inputs["json_obj_list"].type = variable_type

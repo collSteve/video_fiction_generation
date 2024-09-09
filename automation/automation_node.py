@@ -135,6 +135,7 @@ class AutomationNode():
         try:
             self._run()
         except Exception as e:
+            warnings.warn(f"Task {self.id} failed with exception {e}")
             self._status = TaskStatus.Failed
 
         # run succeded
