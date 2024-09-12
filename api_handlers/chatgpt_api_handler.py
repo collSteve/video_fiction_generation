@@ -4,8 +4,9 @@ import os
 
 from openai import OpenAI, ChatCompletion
 
-load_dotenv("../.env")
-print(os.getenv("OPENAI_API_KEY"))
+# load_dotenv("../.env")
+load_dotenv()
+# print(os.getenv("OPENAI_API_KEY"))
 openai_client = OpenAI()
 
 chatgpt_models = ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
@@ -117,3 +118,18 @@ class ChatGPTReturnObj:
 	@property
 	def num_valid_choices(self):
 		return len([choice for choice in self._choices if choice.finish_reason == "stop" and choice.message.role == "assistant"])
+	
+
+
+openai_text2image_model = ["dall-e-3", "dall-e-2"]
+size_options = ["1024x1024",  "1024x1792", "1792x1024"]
+
+def generate_image(prompt, model, size="1024x1024", quality="standard"):
+	response = openai_client.images.generate(
+		model=model,
+		prompt=prompt,
+		size=size,
+		quality=quality,
+		n=1,
+	)
+	return response

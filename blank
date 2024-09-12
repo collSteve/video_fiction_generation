@@ -1,0 +1,11 @@
+def merge_voice_over_image(unsorted_voice_over_path_maps:list[FilePathMap], unsorted_image_path_maps:list[FilePathMap], margin=0.5):
+    voice_over_path_map = sorted(unsorted_voice_over_path_maps, key=lambda k: k.section_number)
+    video_clips = []
+    for vm in voice_over_path_map:
+        img_item = get_map_by_number(unsorted_image_path_maps, vm.section_number)
+        img = ImageClip(img_item.path)
+        audio = AudioFileClip(vm.path)
+        img.set_duration(audio.duration + margin)     # margin/2 + audio + margin/2
+        img.set_audio(CompositeAudioClip([audio.set_start(margin/2)]))
+        video_clips.append(img)
+    return video_clips
