@@ -1,4 +1,5 @@
 import os
+from typing import Callable
 from pydantic import BaseModel
 from ai_script_video.puzzle_video.puzzle_script_generation import generate_script
 from api_handlers.chatgpt_api_handler import call_chatGPT, openai_client
@@ -7,14 +8,14 @@ from api_handlers.ideogram_api_handler import download_image, generate_image
 
 from moviepy.editor import *
 
-raw_script_to_sd_prompt_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\raw_script_to_sd_prompt"
+# raw_script_to_sd_prompt_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\raw_script_to_sd_prompt"
 
-sd_image_gen_folder_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\image_gen_dir"
-voice_over_folder_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\voice_over_dir"
+# sd_image_gen_folder_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\image_gen_dir"
+# voice_over_folder_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\voice_over_dir"
 
-raw_concate_video_folder_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\raw_concate_dir"
+# raw_concate_video_folder_path = "D:\\Projects\\video_fiction_generation\\ai_script_video\\motivation_vid\\raw_concate_dir"
 
-ideogram_model = "V_2_TURBO"
+# ideogram_model = "V_2_TURBO"
 
 class ScriptItem(BaseModel):
     section_number: int
@@ -44,7 +45,7 @@ def generate_raw_script(system_prompt, prompt):
     
     return first_valid_message.content
 
-def generate_sd_prompts(raw_script)->list[SDPrompt]:
+def generate_sd_prompts(raw_script, raw_script_to_sd_prompt_path)->list[SDPrompt]:
     with open(raw_script_to_sd_prompt_path, "r") as f:
         sys_prompt = f.read()
 
@@ -74,7 +75,7 @@ class FilePathMap(BaseModel):
     section_number: int
     path: str
 
-def generate_image_from_prompt(sd_prompts: list[SDPrompt], folder_name):
+def generate_image_from_prompt(sd_prompts: list[SDPrompt], folder_name, sd_image_gen_folder_path, ideogram_model="V_2_TURBO"):
     download_image_folder_path = os.path.join(sd_image_gen_folder_path, folder_name)
 
     # if folder name does not exist
@@ -86,7 +87,7 @@ def generate_image_from_prompt(sd_prompts: list[SDPrompt], folder_name):
         try:
             image_download_path = os.path.join(download_image_folder_path, f"{sd_promt_item.section_number}.png")
 
-            generate_download_image(sd_promt_item.image_prompt, image_download_path)
+            generate_download_image(sd_promt_item.image_prompt, image_download_path, ideogram_model=ideogram_model)
 
             # need change to more stable persistence method. i.e. database
             image_path_maps.append(FilePathMap(section_number=sd_promt_item.section_number, path=image_download_path))
@@ -96,8 +97,30 @@ def generate_image_from_prompt(sd_prompts: list[SDPrompt], folder_name):
         
     return image_path_maps
 
+def generate_image_from_prompt_int(sd_prompts: list[SDPrompt], folder_name, sd_image_gen_folder_path, 
+                                   ideogram_model="V_2_TURBO", 
+                                   on_image_generated:Callable[[int, str], None]=lambda x: None):
+
+    download_image_folder_path = os.path.join(sd_image_gen_folder_path, folder_name)
+
+    # if folder name does not exist
+    if (not os.path.exists(download_image_folder_path)):
+        os.mkdir(download_image_folder_path)
+
+    for sd_promt_item in sd_prompts:
+        try:
+            image_download_path = os.path.join(download_image_folder_path, f"{sd_promt_item.section_number}.png")
+
+            generate_download_image(sd_promt_item.image_prompt, image_download_path, ideogram_model=ideogram_model)
+
+            on_image_generated(sd_promt_item.section_number, image_download_path)
+
+        except Exception as e:
+            raise Exception(f"Error when generating image from prompt: {e}")
+    return
+
 # helper function for generating image
-def generate_download_image(prompt, image_download_path):
+def generate_download_image(prompt, image_download_path, ideogram_model="V_2_TURBO"):
     res = generate_image(prompt, model=ideogram_model)
 
     if res is None:
@@ -114,7 +137,8 @@ def generate_download_image(prompt, image_download_path):
     download_image(image_url, image_download_path)
 
 
-def generate_voice_over(script_items: list[ScriptItem], folder_name):
+def generate_voice_over(script_items: list[ScriptItem], folder_name, voice_over_folder_path):
+
     voice_over_path = os.path.join(voice_over_folder_path, folder_name)
 
     # if folder name does not exist
@@ -129,6 +153,25 @@ def generate_voice_over(script_items: list[ScriptItem], folder_name):
 
         voice_over_path_maps.append(FilePathMap(section_number=script_item.section_number, path=output_path))
     
+    return voice_over_path_maps
+
+def generate_voice_over_int(script_items: list[ScriptItem], folder_name, voice_over_folder_path,
+                        on_voice_over_generated:Callable[[int, str], None]=lambda x: None):
+
+    voice_over_path = os.path.join(voice_over_folder_path, folder_name)
+
+    # if folder name does not exist
+    if (not os.path.exists(voice_over_path)):
+        os.mkdir(voice_over_path)
+
+    voice_over_path_maps: list[FilePathMap] = []
+
+    for script_item in script_items:
+        output_path = os.path.join(voice_over_path, f"{script_item.section_number}.mp3")
+        voice_over(script_item.section_script, output_path)
+
+        on_voice_over_generated(script_item.section_number, output_path)
+
     return voice_over_path_maps
 
 # helper
