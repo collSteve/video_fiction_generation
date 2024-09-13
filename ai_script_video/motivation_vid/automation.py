@@ -181,3 +181,10 @@ sd_prompt_image_path_maps = au.get_sd_prompt_image_path_maps_from_db()
 au.generate_raw_concate_video(sd_prompt_image_path_maps, voice_over_path_maps)
 
 """
+
+"""
+Async
+
+au = SyncAutomationFactory.create_automation("test_story2", test_video_root_dir_path, test_raw_script_to_sd_prompt_path, Automation_Class=AsyncAutomation)
+au.run("Write a video script for motivation video. only the voice over script.","")  
+"""
