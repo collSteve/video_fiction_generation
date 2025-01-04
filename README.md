@@ -19,5 +19,6 @@ sd_prompt_image_path_maps = au.get_sd_prompt_image_path_maps_from_db()
 au.generate_raw_concate_video(sd_prompt_image_path_maps, voice_over_path_maps)
 ```
 
-Sample output:
-[![Watch the video](test_concat.mp4)]
+
+Sample Output: https://github.com/user-attachments/assets/f0f21526-5d0b-4c4e-a3bf-5c1c89256621
+[![Watch the video](https://youtu.be/t-RyzNchH_M)](https://youtu.be/t-RyzNchH_M)
